@@ -1,0 +1,81 @@
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+if ($argc == 1) {
+    echo "--------------------------------------------------------------------\n";
+    echo "                         Welcome to SLIM BOOT                     \n";
+    echo "---------------------------------------------------------------------\n";
+    echo "migrate ------------------------------------------ Run all migrations\n";
+    echo "migrate:reset----------------------------------- Clear all migrations\n";
+    echo "migrate --file={migration}------------------ Run a specific migration\n";
+    echo "---------------------------------------------------------------------\n";
+} else {
+    $action = $argv[1];
+
+    switch ($action) {
+        case 'migrate':
+            if ($argv[2] && substr($argv[2], 0, 8) == '--file=') {
+                runMigrations(substr($argv[2], 8));
+            } else {
+                runMigrations();
+            }
+            break;
+        case 'migrate:reset':
+            resetMigrations();
+            break;
+
+        default:
+            throw new \Exception(message: "Invalid argument $action");
+            break;
+    }
+}
+
+
+function runMigrations($migration = null)
+{
+    $migrationPath = './app/Database/Migrations';
+
+    if ($migration) {
+        $migration = rtrim($migration, '.php');
+        $class = require("$migrationPath/$migration.php");
+
+        if (is_object($class)) {
+            $class->up();
+        }
+    } else {
+        $migrations = scandir("$migrationPath");
+
+        foreach ($migrations as $migration) {
+            if (!in_array($migration, ['.', '..', '.gitkeep'])) {
+
+                $class = require("$migrationPath/$migration");
+
+                if (is_object($class)) {
+                    $class->up();
+                }
+            }
+        }
+    }
+}
+
+function resetMigrations()
+{
+    $migrationPath = './app/Database/Migrations';
+
+    $migrations = scandir("$migrationPath");
+
+    foreach ($migrations as $migration) {
+        if (!in_array($migration, ['.', '..', '.gitkeep'])) {
+
+            $class = require("$migrationPath/$migration");
+
+            if (is_object($class)) {
+                $class->down();
+            }
+        }
+    }
+}
