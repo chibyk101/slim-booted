@@ -1,6 +1,21 @@
 {
-    "name": "your-vendor-name/package-name",
-    "description": "A short description of what your package does",
+    "name": "chibyk/slim-booted",
+    "type": "template",
+    "description": "The Slim framework with more features to speedup development",
+    "keywords": [
+        "slim php framework",
+        "minimalist framework",
+        "micro framework"
+    ],
+    "authors": [
+        {
+            "name": "Chibuike Umezinwa",
+            "email": "chibyk101@gmail.com",
+            "homepage": "https://github.com/chibyk101",
+            "role": "developer"
+        }
+    ],
+    "license": "MIT",
     "require": {
         "slim/slim": "4.*",
         "slim/psr7": "^1.6",

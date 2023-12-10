@@ -15,7 +15,7 @@ class UserController extends Controller
         $this->repository = $repository;
     }
 
-    public function index(Request $request, Response $response)
+    public function index(Response $response)
     {
         $response
             ->getBody()
@@ -48,21 +48,14 @@ class UserController extends Controller
 
     public function update(Request $request, Response $response, $id)
     {
-        try {
+        $this->repository->update($request->getParsedBody(), $id);
+        $response
+            ->getBody()
+            ->write(json_encode([
+                'success' => true
+            ]));
 
-            $this->repository->update($request->getParsedBody(), $id);
-            $response
-                ->getBody()
-                ->write(json_encode([
-                    'success' => true
-                ]));
-    
-            return $this->successResponse($response);
-        } catch (\Exception $e) {
-            $response->getBody()->write($e->getMessage());
-            return $this->errorResponse($response, 500);
-        }
-
+        return $this->successResponse($response);
     }
 
     public function destroy(Response $response, $id)
