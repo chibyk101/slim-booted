@@ -2,38 +2,43 @@
 
 namespace App\Controllers;
 
-use App\Repositories\UserRepository;
+use App\Models\User;
+use App\Support\Validator;
 use Slim\Psr7\Response;
 use Slim\Psr7\Request;
 
 class UserController extends Controller
 {
 
-    public function index(Response $response)
+    public function index(Request $request, Response $response)
     {
         $response
             ->getBody()
-            ->write(json_encode($this->repository->all()));
+            ->write(json_encode(User::query()->paginate()));
 
         return $this->successResponse($response);
     }
 
     public function store(Request $request, Response $response)
     {
-        $this->repository->create($request->getParsedBody());
-        
+        $validator = Validator::make($request->getParsedBody(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|max:255'
+        ]);
+
+        $user = User::create($validator->validate());
+
         $response
             ->getBody()
-            ->write(json_encode([
-                'success' => true
-            ]));
+            ->write($user->toJson());
 
         return $this->successResponse($response);
     }
 
-    public function show(Response $response, $id)
+    public function show(Request $request, Response $response, $id)
     {
-        $user = $this->repository->find($id);
+        $user = User::findOrFail($id);
 
         $response->getBody()->write(json_encode($user));
 
@@ -42,19 +47,23 @@ class UserController extends Controller
 
     public function update(Request $request, Response $response, $id)
     {
-        $this->repository->update($request->getParsedBody(), $id);
+        $user = User::findOrFail($id);
+
+        $user->update(Validator::make($request->getParsedBody(), [
+            'name' => 'required|string',
+            'email' => 'required|email'
+        ]));
+
         $response
             ->getBody()
-            ->write(json_encode([
-                'success' => true
-            ]));
+            ->write($user->toJson());
 
         return $this->successResponse($response);
     }
 
-    public function destroy(Response $response, $id)
+    public function destroy(Request $request, Response $response, $id)
     {
-        $this->repository->delete($id);
+        User::findOrFail($id)->delete();
 
         $response
             ->getBody()

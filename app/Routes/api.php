@@ -19,6 +19,6 @@ $app->group('', function (RouteCollectorProxy $group) {
     $group->put('/users/{id}', [\App\Controllers\UserController::class, 'update']);
 })->add(\App\Middleware\JsonBodyParserMiddleware::class);
 //get a single user
-$app->get('/users/{id}', [\App\Controllers\UserController::class, 'show']);
+$app->get('/users/{user}', [\App\Controllers\UserController::class, 'show']);
 //delete user
 $app->delete('/users/{id}', [\App\Controllers\UserController::class, 'destroy']);
