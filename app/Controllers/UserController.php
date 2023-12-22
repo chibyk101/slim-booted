@@ -8,12 +8,6 @@ use Slim\Psr7\Request;
 
 class UserController extends Controller
 {
-    private $repository;
-
-    public function __construct(UserRepository $repository)
-    {
-        $this->repository = $repository;
-    }
 
     public function index(Response $response)
     {
@@ -27,7 +21,7 @@ class UserController extends Controller
     public function store(Request $request, Response $response)
     {
         $this->repository->create($request->getParsedBody());
-
+        
         $response
             ->getBody()
             ->write(json_encode([
